@@ -1,0 +1,18 @@
+COMMAND_PREFIX=~/code/texlive-container/start.sh
+WATCHING=$(wildcard *.tex *.svg)
+DOCUMENT_TEX=document.tex
+
+PURPLE_COLOR=\033[01;35m
+UNSET_COLOR=\033[0m
+
+all: document.pdf
+
+document.pdf: ${DOCUMENT_TEX}
+	@echo "${PURPLE_COLOR}Building $@${UNSET_COLOR}"
+	${COMMAND_PREFIX} rubber --pdf --into "$(dir $^)" "$^"
+
+clean:
+	[ -d "$(dir ${DOCUMENT_TEX})" ] && ${COMMAND_PREFIX} rubber --pdf --into "$(dir ${DOCUMENT_TEX})" --clean "${DOCUMENT_TEX}"
+
+watch:
+	while [ 1 ]; do inotifywait $(WATCHING) || break; printf "\033c"; make all; done
